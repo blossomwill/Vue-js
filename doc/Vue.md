@@ -367,7 +367,19 @@ Vue를 사용하려면 Vue를 만들면서 태그를 할당하는 el이 필요�
 
 ### 같은 컴포넌트 레벨 간의 통신 방법
 
-같은 컴포넌트 레벨간의 통신은 같은 부모 컴포넌트의  method에 emit으로 값 넘기고 부모 컴포넌트는 자식 컴포넌트의 props에 data로 값을 넘긴다
+같은 부모 컴포넌트의  method에 emit으로 값 넘기고, 부모 컴포넌트는 자식 컴포넌트의 props에 data로 값을 넘긴다
+
+* 부모: Root
+* 자식: app-header, app-content
+
+* app-content의 버튼을 클릭하면 emit을 발생시키는 passNum 메소드를 실행한다.
+* 발생된 emit은 값을 부모의 메소드은 deliverNum에 넘긴다. 메소드에 인자 받는 구문이 정의되있더라도 뷰 디렉티브에서는 인자를 표시해줄 필요없이 메소드명을 적으면된다.
+* Root 메소드에서는 넘겨받은 값을 Root의 데이터인 num에 할당한다.
+* app-header는 props를 갖고 있고 Root의 num을 뷰디렉티브를 통해 props 변수에 저장한다
+  * props 변수는 대문자가 올수 없다. -> 인식 못함
+* app-header는 props에 동일 레벨 컴포넌트 app-content로 넘겨받은 값을 갖게된다.
+* `v-bind:프롭스속성이름="상위 컴포넌트의 데이터 이름"`
+* `v-on:emit이름="상위 컴포넌트의 메소드 이름 "`
 
 ```vue
 <div id="app">
@@ -407,3 +419,184 @@ Vue를 사용하려면 Vue를 만들면서 태그를 할당하는 el이 필요�
     </script>
 ```
 
+
+
+### 뷰 라우터 소개와 설치
+
+뷰 라우터는 뷰 라이브러리를 이용하여 SPA를 구현할때 사용하는 (공식)라이브러리로, 페이지를 이동할 때 사용한다.
+
+* `사용`: 뷰 라우터 인스턴스를 생성하고 뷰 인스턴스에 등록한다.
+
+* `routes`:  페이지의 라우팅 정보(path, name, component)가 있는 라우터객체 지정 속성
+  * 페이지마다 component는 1개만 등록
+
+* `mode`: URL의 해쉬 값 제거 속성
+  * `mode: 'history'`
+
+##### router-view
+
+* 페이지 url이 변경됐을 때 해당 url의 컴포넌트 내용을(컴포넌트의 template이겠지?) 나타내는 태그 영역
+
+##### router-link
+
+* 라우터에서 페이지 이동을 하기위한 링크태그
+  * `<router-link to="이동할 url"></router-link>` 
+
+**라우터 추가로 알아보기**: [라우터 네비게이션](<https://joshua1988.github.io/web-development/vuejs/vue-router-navigation-guards/>)
+
+> router.html
+
+```html
+<body>
+    <div id="app">
+        <div>
+            <router-link to="/login" style="text-decoration:none;color:aqua;">Login</router-link>
+            <router-link to="/main">Main</router-link>
+        </div>
+        <router-view></router-view>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+    <script>
+        let LoginComponent = {
+            template: '<div>login</div>'
+        }
+        
+        let MainComponent = {
+            template: '<div>main</div>'
+        }
+
+        let router = new VueRouter({
+            // 페이지의 라우팅 정보
+            routes : [
+                // 로그인 페이지 정보
+                {
+                    // 페이지의 url
+                    path: '/login',
+                    // 해당 url에서 표시된 컴포넌트
+                    component: LoginComponent,                
+                },
+                // 메인 페이지 정보
+                {
+                    path: '/main',
+                    component: MainComponent,
+                }
+            ]
+        });
+
+        new Vue({
+            el: '#app',
+            router: router,
+        });
+    </script>
+
+</body>
+```
+
+### 자바스크립트의 비동기 처리와 콜백
+
+> 자바스크립트의 비동기 처리란 특정 코드의 연산이 끝날 때까지 코드의 실행을 멈추지 않고 다음 코드를 먼저 실행하는 자바스크립트의 특성을 의미한다.
+
+```
+자바스크립트의 비동기 처리 패턴
+1. callback
+2. promise
+3. promise + generator
+4. async & await
+```
+
+* `callback`: 함수를 호출한 결과가 나온 시점에서만 동작을 수행하도록 한다.
+
+함수를 호출하면 콜백함수가 완료 될 때까지 해당 함수의 데이터를 처리하는 구문을 실행하지 않고 다음 코드를 실행하다가 콜백함수가 완료됐다고 부르면 함수의 동작을 수행하도록 해준다.
+
+### Promise
+
+* 데이터를 받아오기 전에 화면에 데이터를 표시하는 오류를 해결하기 위한 방법
+
+  
+
+### axios
+
+Vue에서 권고하는 Pomise 기반의 HTTP 통신 라이브러리
+
+`구조`: config, data,  headers, request
+
+#### 오픈소스 사용 Tip
+
+* 사용 전 Star, commits, contributors 수 확인
+* 수정 날짜 확인
+
+* use
+
+axios.get 요청을 보내서 response를 받는다. Vue의 data에 reponse데이터를 할당해서 사용한다.
+
+```javascript
+new Vue({
+            el: '#app',
+            data: {
+                users: []
+            },
+            methods: {
+                getData: function() {
+                    axios.get('https://jsonplaceholder.typicode.com/users/')
+                    .then(function(response) {
+                        console.log(response.data);
+                        this.users = response.data;
+                      })
+                      .catch(function(error) {
+                        console.log(error);
+                      });
+                }
+            }
+        })
+```
+
+axios 호출 전의 this는 Vue 인스턴스를 가리키지만 axios안의 this는 Window 전역을 가리킨다.
+
+
+
+### 웹 서비스에서의 클라이언트와 서버와의 HTTP 통신구조
+
+* `브라우저(Client)` --- HTTP Request(요청) ---> `서버(특정 백엔드 로직)` --- 값 꺼내기---> `DB`
+
+* `서버` --- HTTP Response(응답) ---> `브라우저(Client)`
+
+### 개발자 도구  network 패널 보기
+
+XHR이라는 비동기 통신만 filtering
+
+`Name의 Header`: 특정 요청, 응답에 대한 부가적인 정보. General에서 요청 URL, Method, Status Code를 볼 수 있다.
+
+### 뷰의 템플릿 문법
+
+뷰로 화면을 조작하는 방법. 데이터 바인딩과 디렉티브로 나뉜다.
+
+`데이터 바인딩`: 뷰 인스턴스에서 정의한 속성을 화면에 표시하는 방법 {{ }}
+
+`디렉티브`: html에서 `v-`가 붙는 속성. 뷰로 화면의 요소를 쉽게 조작하는 문법, 인스턴스와 태그를 연결한다.
+
+```html
+<div id="app">
+        <p>{{ num }}</p>
+        <p>{{ doubleNum }}</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                num: 10,
+            },
+            computed: {
+                doubleNum: function() {
+                    return this.num * 2;
+                }
+            }
+        })
+    </script>
+```
+
+* 인스턴스의 속성인 num은 화면에서 {{ num }}으로 나타나게한다.
+* num의 2배인 doubleNum은 computed속성의 객체에서 2배로 계산된 값을 가진다.
