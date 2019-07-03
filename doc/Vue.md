@@ -363,3 +363,47 @@ Vue를 사용하려면 Vue를 만들면서 태그를 할당하는 el이 필요�
 </body>
 ```
 
+
+
+### 같은 컴포넌트 레벨 간의 통신 방법
+
+같은 컴포넌트 레벨간의 통신은 같은 부모 컴포넌트의  method에 emit으로 값 넘기고 부모 컴포넌트는 자식 컴포넌트의 props에 data로 값을 넘긴다
+
+```vue
+<div id="app">
+        <app-header v-bind:props-num="num"></app-header>
+        <app-content v-on:pass="deliverNum"></app-content>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        let appHeader = {
+            template: '<div>header</div>',
+            props: ['props-num']
+        }
+        let appContent = {
+            template: '<div>Content<button v-on:click="passNum">pass</button></div>',
+            methods: {
+                passNum: function() {
+                    this.$emit('pass', 10)
+                }
+            }
+        }
+        new Vue({
+            el: '#app',
+            components: {
+                'app-header': appHeader,
+                'app-content': appContent,
+            },
+            data: {
+                num: 0
+            },
+            methods: {
+                deliverNum: function(value){
+                    this.num = value;
+                }
+            }
+        })
+    </script>
+```
+
