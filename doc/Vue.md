@@ -576,6 +576,8 @@ XHR이라는 비동기 통신만 filtering
 
 `디렉티브`: html에서 `v-`가 붙는 속성. 뷰로 화면의 요소를 쉽게 조작하는 문법, 인스턴스와 태그를 연결한다.
 
+* 
+
 ```html
 <div id="app">
         <p>{{ num }}</p>
@@ -599,4 +601,634 @@ XHR이라는 비동기 통신만 filtering
 ```
 
 * 인스턴스의 속성인 num은 화면에서 {{ num }}으로 나타나게한다.
-* num의 2배인 doubleNum은 computed속성의 객체에서 2배로 계산된 값을 가진다.
+* 데이터의 값에 따라 바뀌는 데이터는 data에 정의하지 않고 `computed` 속성에 정의한다.
+
+### 뷰 디렉티브와 v-bind
+
+* `v-` 구문이 있으면 Vue의 data 속성과 computed 속성에서 변수, 객체를 찾는다.
+
+```html
+<div id="app">
+        hello<p v-if='show'>Vue.js</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                show: true
+            }
+        })
+    </script>
+```
+
+
+
+* `v-bind`: html의 속성과 Vue인스턴스의 속성을 연결
+  * html의 id, class 등과 Vue의 data속성, computed속성을 연결
+
+```html
+<div id="app">
+        <p v-bind:id="uuid" v-bind:class="name">{{ num }}</p>
+    <p>{{ doubleNum }}</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                num: 10,
+                uuid: 'abc1234',
+                name: 'text-blue',
+            },
+            computed: {
+                doubleNum: function() {
+                    return this.num * 2;
+                }
+            }
+        })
+    </script>
+```
+
+### v-if, v-show
+
+* v-if는 if - else 문과 동일한데 구문에 Vue의 속성을 사용한다. 
+
+  * 조건 만족 시 태그를 실행하고 아니면 태그가 Dom에서 제거된다.
+
+* v-show는 조건만족시 태그를 실행하고 아니면 `display:none`이 되어 육안상 사라지지만(공간도 잡지않지만)
+
+  DOM에 정보가 남아있다.
+
+  ```html
+  <div id="app">
+          <div v-if="loading">
+              Loding...
+          </div>
+          <div v-else>
+              test user has been logged in
+          </div>
+          <div v-show="loading">
+              Loding...
+          </div>
+      </div>
+  
+      <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+      <script>
+          new Vue({
+              el: '#app',
+              data: {
+                  loading: true
+              },
+          })
+      </script>
+  ```
+
+  
+
+### 공식문서를 보고 해결하는 방법
+
+##### input
+
+```html
+<!-- TOD0: 인풋 박스를 만들고 입력된 값을 p태그에 출력해부세요. -->
+        <input type="text" v-model="message">
+        <p>{{ message }}</p>
+		new Vue({
+            el: '#app',
+            data: {
+                num: 10,
+                uuid: 'abc1234',
+                name: 'text-blue',
+                loading: true,
+                message: '',
+            },
+		})
+```
+
+
+
+### methods 속성과 v-on 디렉티브를 이용한 키보드, 마우스 이벤트 처리
+
+`v-on:` : 이벤트 발생과 Vue의 인스턴스를 연결
+
+`이벤트 모디파이어`: 이벤트에 추가로 갖는 조건, 속성을 지정
+
+```html
+<div id="app">
+        <button v-on:click="logText">click me</button>
+        <input type="text" v-on:keyup.enter="logText">
+        <button>add</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            methods: {
+                logText: function(){
+                    console.log('clicked');
+                }
+            }
+        })
+    </script>
+```
+
+`v-on:keyup.enter`의 효과
+
+* 입력하고서 사용자가 엔터를 쳤을 때 마치 add를 클릭해 이벤트를 발생한 시킨것 같은 효과를 준다.
+
+
+
+### watch
+
+* watch에 지정한 vue의 속성값이 변경했을 때 function을 실행시킬 수 있다.
+* 매번 실행되는게 부담스러운 로직, 데이터 요청에 적합하다
+
+`computed`: 로직이 실행될 때 기준이 data의 값이다. validator나 간단한 텍스트 연산
+
+`watch`: 
+
+
+
+### computed 속성을 이용한 클래스 코드 작성 방법
+
+#### computed 속성 이용하지 않은 방법
+
+* `v-bind:class={style 클래스속성이름: Vue의data}`: Vue 데이터 값이 True면 style 클래스가 적용됨
+
+```html
+<style>
+  .warning {
+    color: red;
+  }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <p v-bind:class="{ warning: isError }">Hello</p>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        // cname: 'blue-text',
+        isError: false
+      },
+    });
+  </script>
+</body>
+```
+
+#### computed 속성 이용
+
+* computed로 값을 바뀌게 하면 html의 v-bind:class 구문을 더 깔끔하게 만들수 있다.
+  * ex) 메소드 호출해서 Vue data가 바뀌도록한다
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+  .warning {
+    color: red;
+  }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <p v-bind:class="errorTextColor">Hello</p>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        // cname: 'blue-text',
+        isError: false
+      },
+      computed: {
+        errorTextColor: function() {
+          // if (isError) {
+          //   return 'warning'
+          // } else {
+          //   return null;
+          // }
+          return this.isError ? 'warning' : null;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+```
+
+
+
+### Vue CLI 소개
+
+* CLI: Command Line Interface
+
+* 명령어 실행 도구
+
+#### 설치
+
+* [Vue CLI](https://cli.vuejs.org/guide/)
+* Installation
+* node 10버전 이상, npm 6버전 이상
+
+```
+node -v
+npm -v
+npm install -g @vue/cli
+```
+
+### CLI 도구 설치시 문제점과 설치 장소
+
+* 에러 발생은 npm을 설치한 위치에 대한 권한이 없기 때문에 발생
+  * `sudo npm install -g @vue/cli
+
+
+
+### CLI 2.x와 3.x의 차이점/ 프로젝트 생성 및 서버 실행
+
+Vue CLI 2.x
+
+* vue init '프로젝트 템플릿 유형' '프로젝트 폴더 위치'
+* vue init webpack-simple '프로젝트 폴더 위치'
+
+Vue CLI 3.x
+
+* vue create '프로젝트 폴더 위치'
+
+```bash
+vue create vue-cli
+cd vue-cli
+npm run serve
+```
+
+
+
+### CLI로 생성한 프로젝트 폴더 구조 확인 및 main.js 파일 설명
+
+* npm(node package manager): package.json에서 라이브러리 설정
+
+##### npm run serve
+
+`npm run serve`: package.json에서 "serve": "vue-cli-service serve"라고 정의되어있다. 
+
+vue-cli-serve serve 라는 명령어를 serve라고 맵핑한것
+
+`npm run serve`은 index.html 파일을 실행한다. `<!-- *built files will be auto injected* -->` 구문에는 src폴더의 main.js, App.vue를 포함한 다른 파일들이 하나의 파일로 주입된다. 내부적으로 웹팩으로 실행된다.
+
+##### main.js
+
+컴포넌트의 내용을 다른 파일로부터 불러와서 렌더를 하는 code
+
+```js
+import Vue from 'vue'
+import App from './App.vue'
+
+Vue.config.productionTip = false
+
+new Vue({
+  render: h => h(App),
+}).$mount('#app')
+
+new Vue({
+  el: '#app',
+  render: h => h(App),
+})
+```
+
+mount를 '#app'에 붙이겠다는 것은 아래의 코드와 같다.
+
+render: 내부적으로 사용하는 함수이자 사용자(개발자)도 사용하는 함수 템플릿 속성을 지정(사용)했을 때 render가 실행된다.
+
+### 싱글 파일 컴포넌트 소개 및 적용 방법
+
+vue 구문 자동완성: scf + tap
+
+##### App.vue 형태
+
+```vue
+<template>
+    <!-- HTML -->
+    <div>header</div>
+</template>
+
+<script>
+export default {   // es6문법
+    
+    // Javascript
+    methods: {
+        addNum: function() {
+
+        }
+    }
+}
+</script>
+
+<style>
+    /* CSS */
+</style>
+
+```
+
+* 기존에 배운 방법의 코드
+
+```
+let appHeader = {
+    template: '<div>header</div>',
+    methods: {
+        addNum: function() {
+
+        }
+    }
+}
+```
+
+
+
+### App.vue와 HellowWorld.vue 설명
+
+* 표기법 3가지
+
+```
+<!-- 컴포넌트 명명법 종류 -->
+<hello-world></hello-world> // 파일바로가기 하려면 이 명명법(케파키크) 사용해야함
+<HelloWorld></HelloWorld> // 파스칼케이스
+// 두 표기는 똑같다
+<HelloWorld/> // 좀더 진보된 표현
+```
+
+```
+components: {
+    HelloWorld,
+    'hello-world': HelloWorld
+  }
+```
+
+* 컴포넌트를 등록하는 두 명명법은 같은 동작을 한다.
+
+> HelloWorld.vue
+
+```vue
+<script>
+// let appContent = {
+//   props: ['propsdata']
+// }
+
+export default {
+  // 인스턴스 옵션 속성
+  name: 'HelloWorld',
+  props: {
+    msg: String,
+    //props: ['msg']
+  }
+}
+</script>
+
+// let appContent = {
+//   props: ['propsdata']
+// }
+```
+
+* export default의 props 속성 정의와 주석에 쓰인 props정의는 같은 동작을 한다
+
+
+
+### 싱글 파일 컴포넌트에 배운 적용하여 개발 시작하기
+
+[배민찬은 Vue를 어떻게 사용하나요?](<http://woowabros.github.io/experience/2018/06/07/vue-story-of-baminchan.html>)
+
+* template에서 최상단의 root html 태그는 하나만 있어야 한다. root에 html 병렬 불가
+  * 여기서 root는 Vue의 ROOT가 아니라 template안에서 root를 말한다
+
+* data 정의 방법의 변화
+
+여러개의 component를 재사용할 가능성이 높다. 여러개의 컴포넌트에서 동일한 값을 참조하면 안되기 때문에 
+
+data: {}라는 객체가 아니라 data: function(){}으로 새객체를 반환하는 형태로 만들어줘야한다.
+
+### 싱글 파일 컴포넌트 체계에서 컴포넌트 등록하기
+
+* 컴포넌트이름은 파스칼방식으로 두단어 이상으로 조합
+
+AppHeader.vue의 내용을 App.vue에서 사용하려면 App.vue에서 AppHeader.vue를 import하고 components에 등록한다. (import할때 파일위치는 확장자까지 붙여준다.)
+
+### 싱글 파일 컴포넌트에서 props 속성 사용하는 방법
+
+상위 컴포넌트인 App.vue에서 하위 컴포넌트 AppHeader.vue에 str이란 데이터를 내리는 경우
+
+`<!-- *<app-header v-bind:프롭스 속성이름="상위 컴포넌트의 데이터이름"></app-header>* -->`  사용
+
+> App.vue
+
+```html
+<app-header v-bind:propsdata="str"></app-header>
+```
+
+> AppHeader.vue
+
+```vue
+<script>
+export default {
+    props: ['propsdata']
+}
+```
+
+### SFC에서 event emit 구현하기
+
+하위 컴포넌트에서 emit으로 event를 발생시키면 상위 컴포넌트에서 event에 대한 method실행으로 데이터를 조작한다. 상위 컴포넌트에서 하위 컴포넌트를 실행하는 영역안에 있는 태그의 속성에 `v-on: `을 지정한다.
+
+> AppHeader.vue
+
+```
+methods: {
+        sendEvent: function() {
+            this.$emit('renew') // 이벤트를 올린다.
+        }
+    }
+```
+
+> App.vue
+
+```vue
+<app-header 
+      v-bind:propsdata="str"
+      v-on:renew="renewStr">
+      </app-header>
+
+
+data: function() {
+return {
+str: Header
+}
+}
+methods: {
+    renewStr: function() {
+      this.str='hi';
+    }
+  }
+```
+
+
+
+### 프로젝트 생성 및 마크업 작업
+
+프로젝트 생성
+
+```bash
+vue create vue-form
+cd vue-form
+npm run serve
+```
+
+* App.vue 내용 제거 scf+tap
+* HelloWorld.vue 삭제
+
+마크업 작업
+
+> App.vue
+
+```vue
+<form action="">
+    <div>
+      <label for="username">id: </label>
+      <input type="username" type="text">
+    </div>
+    <div>
+      <label for="password"></label>
+      <input id="password" type="text">
+    </div>
+  </form>
+```
+
+* label의 for는 어떤 태그를 위한 label을 의미하는지 작성
+* input의 id는 앞의 for의 이름과 맞춰주면 label과 input은 한쌍이 된다.
+
+### v-model 속성과 submit 이벤트 처리
+
+* 버튼을 눌렀을 때 새로고침되는 문제
+
+button의 type이 "submit"이면 event가 form 태그로 올라간다. 그래서 form 태그에서 
+
+`v-on:submit="submitForm"`으로 submit 이벤트를 form태그에서 받았을 때 submitForm 메소드를 실행한다.
+
+submit을 하면 어떤 페이지로 넘어가는 동작을 하기때문에 새로고침이 된다. 
+
+> 기존 JS의 새로고침 방지
+
+```vue
+<form v-on:submit="submitForm">
+    <div>
+      <label for="username">id: </label>
+      <input id="username" type="text" v-model="username">
+    </div>
+    <div>
+      <label for="password">pw: </label>
+      <input id="password" type="password" v-model="password">
+    </div>
+    <button type="submit">loin</button>
+  </form>
+
+submitForm: function(event) {
+      event.preventDefault();
+      console.log(this.username, this.password);
+    }
+```
+
+event인자는 submit이벤트를 받고, 이 인자가 preventDefault()를 실행하면 새로고침이  일어나지 않는다.
+
+> Vue의 새로고침 방지
+
+```vue
+<form v-on:submit.prevent="submitForm">
+    <div>
+      <label for="username">id: </label>
+      <input id="username" type="text" v-model="username">
+    </div>
+    <div>
+      <label for="password">pw: </label>
+      <input id="password" type="password" v-model="password">
+    </div>
+    <button type="submit">loin</button>
+  </form>
+
+    submitForm: function() {
+      //event.preventDefault();
+      console.log(this.username, this.password);
+    }
+  }
+```
+
+### axios를 이용한 데이터 전송 및 form 구현
+
+````bash
+npm i axios
+````
+
+`npm`: npm 라이브러리를 현재 프로젝트에 다운받는다.
+
+```vue
+<script>
+    import axios from 'axios';
+    export default {
+        methods: {
+    submitForm: function() {
+          //event.preventDefault();
+          console.log(this.username, this.password);
+          let url = 'https://jsonplaceholder.typicode.com/users';
+          let data = {
+            username: this.username,
+            password: this.password,
+          }
+          axios.post(url, data)
+          .then(function(response){
+            console.log(response);
+          })
+          .catch(function(response){
+            console.log(response);
+          });
+        }
+        }
+    }
+</script>
+```
+
+
+
+### 수업정리 및 향후 학습 방향 안내
+
+- Reactivity: 데이터 변화를 Vue에서 감지해서 화면에 나타낸다
+
+* 인스턴스
+* 컴포넌트: 화면의 영역을 구분해서 개발하는 방식
+* 컴포넌트 통신
+  * props
+  * event emi
+* HTTP 통신 라이브러리 (axios)
+* 템플릿 문법
+  * 데이터 바인딩: 데이터를 화면에 엮어 나타냄
+  * 뷰 디렉티브 (v-) : 화면을 제어하기 위한 문법
+* Vue CLI
+* 싱글 파일 컴포넌트
+
+###### [Vue.js 공식문서](<https://vuejs.org/v2/guide/index.html>)
+
+###### [Vue.js 스타일 가이드](<https://kr.vuejs.org/v2/style-guide/index.html>)
+
+###### [Vue.js cookbook](<https://vuejs.org/v2/cookbook/index.html>)
+
+###### [Vuex 공식 문서](<https://vuex.vuejs.org/kr/>)
+
